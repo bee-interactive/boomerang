@@ -1,0 +1,62 @@
+{
+    "name": "bee-interactive/boomerang",
+    "description": "Boomerang notifier for the Laravel PHP framework. Monitor and report Laravel errors.",
+    "keywords": [
+        "laravel",
+        "boomerang",
+        "errors",
+        "exceptions",
+        "monitoring"
+    ],
+    "homepage": "https://github.com/bee-interactive/boomerang",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yves Engetschwiler",
+            "email": "info@bee-interactive.ch"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "composer-runtime-api": "^2.2",
+        "guzzlehttp/guzzle": "^7.8",
+        "laravel/framework": "^11.0|^12.0|^13.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.12",
+        "laravel/pint": "^1.24",
+        "orchestra/testbench": "^9.18|^10.12|^11.3",
+        "pestphp/pest": "^3.8|^4.7|^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "BeeInteractive\\Boomerang\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BeeInteractive\\Boomerang\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "format": "pint",
+        "test": "pest",
+        "test:coverage": "pest --coverage --min=100"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BeeInteractive\\Boomerang\\BoomerangServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
