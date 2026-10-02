@@ -73,7 +73,7 @@ it('reports a failing request once it has been answered', function () {
     $this->get('/broken')->assertServerError();
 
     expect(sentPayloads())->toHaveCount(1)
-        ->and(sentPayloads()[0]['context']['request']['url'])->toBe('http://localhost/broken');
+        ->and(sentPayloads()[0]['context']['request']['url'])->toBe(url('/broken'));
 });
 
 it('ignores failures while receiving a report from another application', function () {

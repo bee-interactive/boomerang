@@ -43,7 +43,7 @@ it('describes the current request', function () {
 
     expect($context['request'])->toBe([
         'method' => 'POST',
-        'url' => 'http://localhost/invoices/12',
+        'url' => url('/invoices/12'),
         'route' => 'invoices.update',
         'action' => 'Closure',
         'input' => ['total' => 120, 'password' => '[redacted]', 'draft' => '1'],
