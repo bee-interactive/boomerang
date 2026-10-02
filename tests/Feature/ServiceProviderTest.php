@@ -3,6 +3,8 @@
 use BeeInteractive\Boomerang\BoomerangServiceProvider;
 use BeeInteractive\Boomerang\Reporter;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
 it('merges its configuration', function () {
@@ -61,4 +63,44 @@ it('tells when it is not configured', function () {
         ->expectsOutputToContain('NOT SET')
         ->doesntExpectOutputToContain('YES')
         ->assertSuccessful();
+});
+
+it('reports through a handler that wraps the application one, like Collision does in the console', function () {
+    Http::fake(['*' => Http::response(status: 202)]);
+
+    $this->app->instance(ExceptionHandler::class, new class(new Handler($this->app)) implements ExceptionHandler
+    {
+        public function __construct(private ExceptionHandler $handler) {}
+
+        public function report(Throwable $e)
+        {
+            $this->handler->report($e);
+        }
+
+        public function shouldReport(Throwable $e)
+        {
+            return $this->handler->shouldReport($e);
+        }
+
+        public function render($request, Throwable $e)
+        {
+            return $this->handler->render($request, $e);
+        }
+
+        public function renderForConsole($output, Throwable $e)
+        {
+            $this->handler->renderForConsole($output, $e);
+        }
+
+        public function reportable(callable $reportUsing)
+        {
+            return $this->handler->reportable($reportUsing);
+        }
+    });
+
+    (new BoomerangServiceProvider($this->app))->boot($this->app['events']);
+
+    app(ExceptionHandler::class)->report(new RuntimeException('Command "boomerang:testes" is not defined.'));
+
+    expect(sentPayloads())->toHaveCount(1);
 });

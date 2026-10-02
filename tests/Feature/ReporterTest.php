@@ -175,3 +175,17 @@ it('never throws while sending pending reports', function () {
 
     expect(sentPayloads())->toHaveCount(1);
 });
+
+it('sends an exception once, however many times it is reported', function () {
+    Http::fake(['*' => Http::response(status: 202)]);
+    $this->usePackageAsBasePath();
+    $reporter = app(Reporter::class);
+    $exception = caught(fn () => (new Thrower())->fail());
+
+    $reporter->report($exception);
+    $reporter->report($exception);
+    $this->travel(11)->seconds();
+    $reporter->report(caught(fn () => (new Thrower())->fail()));
+
+    expect(array_column(sentPayloads(), 'skipped'))->toBe([0, 0]);
+});

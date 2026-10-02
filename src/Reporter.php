@@ -5,10 +5,13 @@ namespace BeeInteractive\Boomerang;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Throwable;
+use WeakMap;
 
 class Reporter
 {
     private array $pending = [];
+
+    private WeakMap $reported;
 
     private bool $busy = false;
 
@@ -21,7 +24,9 @@ class Reporter
         private readonly Throttle $throttle,
         private readonly Transport $transport,
         private readonly Spool $spool,
-    ) {}
+    ) {
+        $this->reported = new WeakMap();
+    }
 
     public function enabled(): bool
     {
@@ -32,10 +37,11 @@ class Reporter
 
     public function report(Throwable $exception): void
     {
-        if ($this->busy || ! $this->enabled() || $this->fromAnotherReporter()) {
+        if ($this->busy || isset($this->reported[$exception]) || ! $this->enabled() || $this->fromAnotherReporter()) {
             return;
         }
 
+        $this->reported[$exception] = true;
         $this->busy = true;
 
         try {

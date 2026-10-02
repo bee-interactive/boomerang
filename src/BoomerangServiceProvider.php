@@ -8,7 +8,6 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Console\AboutCommand;
-use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\ServiceProvider;
@@ -29,7 +28,7 @@ class BoomerangServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events): void
     {
         $this->callAfterResolving(ExceptionHandler::class, function (ExceptionHandler $handler) {
-            if ($handler instanceof Handler) {
+            if (method_exists($handler, 'reportable')) {
                 $handler->reportable(fn (Throwable $exception) => $this->app->make(Reporter::class)->report($exception));
             }
         });
